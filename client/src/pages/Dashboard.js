@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from "react";
-import useAuth from "../hooks/useAuth";
 import SpotifyWebApi from 'spotify-web-api-node';
 import axios from 'axios';
 
@@ -15,9 +14,10 @@ const spotifyApi = new SpotifyWebApi({
     clientId: 'eafcddb12107467390a765e15f4e9e71',
 });
 
-export default function Dashboard({ code }) {
+export default function Dashboard() {
 
-    const accessToken = useAuth(code);
+    // const accessToken = useAuth(code);
+    const accessToken = localStorage.getItem('accessToken');
     const [searchQuery, setSearchQuery] = useState('');
     const [searchResults, setSearchResults] = useState([]);
     const [selectedTrack, setSelectedTrack] = useState(null);

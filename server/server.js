@@ -11,23 +11,34 @@ app.use(cors());
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 
-app.post('/login', (req, res) => {
-    const { code } = req.body;
+app.get('/', (req, res) => {
+    res.send('HELLO');
+});
+
+app.get('/login', (req, res) => {
+
+    const { code } = req.query;
+    const clientRedirect = 'http://localhost:3000/login';
 
     const spotifyApi = new SpotifyWebApi({
         clientId: 'eafcddb12107467390a765e15f4e9e71',
         clientSecret: process.env.SPOTIFY_CLIENT_SECRET,
-        redirectUri: 'http://localhost:3000',
+        redirectUri: 'http://localhost:3001/login',
     });
 
+    console.log('Hello2');
     spotifyApi.authorizationCodeGrant(code).then(
         (data) => {
-            res.json({
-                accessToken: data.body.access_token,
-                refreshToken: data.body.refresh_token,
-                expiresIn: data.body.expires_in,
-            });
+            console.log(data.body);
+            // res.json({
+            //     accessToken: data.body.access_token,
+            //     refreshToken: data.body.refresh_token,
+            //     expiresIn: data.body.expires_in,
+            // });
+            res.redirect(`${clientRedirect}?accessToken=${data.body.access_token}&refreshToken=${data.body.refresh_token}&expiresIn=${data.body.expires_in}`);
+
         }).catch((error) => {
+            console.error('LOGIN ERROR', error);
             res.sendStatus(500);
         })
 });

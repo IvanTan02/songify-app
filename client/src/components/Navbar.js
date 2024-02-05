@@ -13,12 +13,15 @@ import Tooltip from '@mui/material/Tooltip';
 import MenuItem from '@mui/material/MenuItem';
 import MusicNoteIcon from '@mui/icons-material/MusicNote';
 
+import { redirect, useNavigate } from 'react-router-dom';
+
 const pages = ['Dashboard', 'Statistics'];
-const settings = ['Profile', 'Logout'];
 
 export default function Navbar() {
     const [anchorElNav, setAnchorElNav] = React.useState(null);
     const [anchorElUser, setAnchorElUser] = React.useState(null);
+
+    const navigate = useNavigate();
 
     const handleOpenNavMenu = (event) => {
         setAnchorElNav(event.currentTarget);
@@ -33,6 +36,13 @@ export default function Navbar() {
 
     const handleCloseUserMenu = () => {
         setAnchorElUser(null);
+    };
+
+    const handleLogout = () => {
+        localStorage.removeItem('accessToken');
+        localStorage.removeItem('refreshToken');
+        localStorage.removeItem('expiresIn');
+        window.location = '/';
     };
 
     return (
@@ -117,15 +127,20 @@ export default function Navbar() {
 
                     {/* REGULAR NAV LINKS */}
                     <Box sx={{ flexGrow: 1, display: { xs: 'none', md: 'flex' }, ml: 4 }}>
-                        {pages.map((page) => (
-                            <Button
-                                key={page}
-                                onClick={handleCloseNavMenu}
-                                sx={{ my: 2, color: 'white', display: 'block', fontSize: '1em' }}
-                            >
-                                {page}
-                            </Button>
-                        ))}
+                        <Button
+                            key='Home'
+                            onClick={() => { navigate('/'); }}
+                            sx={{ my: 2, color: 'white', display: 'block', fontSize: '1em' }}
+                        >
+                            Home
+                        </Button>
+                        <Button
+                            key='Statistics'
+                            onClick={() => { navigate('/statistics'); }}
+                            sx={{ my: 2, color: 'white', display: 'block', fontSize: '1em' }}
+                        >
+                            Statistics
+                        </Button>
                     </Box>
 
                     {/* USER SETTINGS */}
@@ -151,11 +166,12 @@ export default function Navbar() {
                             open={Boolean(anchorElUser)}
                             onClose={handleCloseUserMenu}
                         >
-                            {settings.map((setting) => (
-                                <MenuItem key={setting} onClick={handleCloseUserMenu}>
-                                    <Typography textAlign="center">{setting}</Typography>
-                                </MenuItem>
-                            ))}
+                            <MenuItem key='Profile' onClick={handleCloseUserMenu}>
+                                <Typography textAlign="center">Profiles</Typography>
+                            </MenuItem>
+                            <MenuItem key='Logout' onClick={handleLogout}>
+                                <Typography textAlign="center">Logout</Typography>
+                            </MenuItem>
                         </Menu>
                     </Box>
                 </Toolbar>
