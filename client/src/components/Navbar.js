@@ -8,12 +8,16 @@ import Menu from '@mui/material/Menu';
 import MenuIcon from '@mui/icons-material/Menu';
 import Container from '@mui/material/Container';
 import Avatar from '@mui/material/Avatar';
+import Chip from '@mui/material/Chip';
 import Button from '@mui/material/Button';
 import Tooltip from '@mui/material/Tooltip';
 import MenuItem from '@mui/material/MenuItem';
 import MusicNoteIcon from '@mui/icons-material/MusicNote';
+import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
 
 import { redirect, useNavigate } from 'react-router-dom';
+import useProfile from '../hooks/useProfile';
+import { AUTH_URL } from '../config/authUrl';
 
 const pages = ['Dashboard', 'Statistics'];
 
@@ -22,6 +26,7 @@ export default function Navbar() {
     const [anchorElUser, setAnchorElUser] = React.useState(null);
 
     const navigate = useNavigate();
+    const { profile, loading } = useProfile();
 
     const handleOpenNavMenu = (event) => {
         setAnchorElNav(event.currentTarget);
@@ -146,9 +151,31 @@ export default function Navbar() {
                     {/* USER SETTINGS */}
                     <Box sx={{ flexGrow: 0 }}>
                         <Tooltip title="Open settings">
-                            <IconButton onClick={handleOpenUserMenu} sx={{ p: 0 }}>
-                                <Avatar alt="Remy Sharp" src="/static/images/avatar/2.jpg" />
-                            </IconButton>
+                            {profile ? (
+                                <Chip
+                                    avatar={<Avatar alt={profile?.display_name} src={profile?.images[1].url} />}
+                                    label={
+                                        <Box display="flex" sx={{ mr: -1, ml: 0.2 }}>
+                                            <Typography>{profile?.display_name}</Typography>
+                                            <KeyboardArrowDownIcon />
+                                        </Box>
+                                    }
+                                    variant="filled"
+                                    color="primary"
+                                    sx={{ p: 1, mr: 3 }}
+                                    onClick={handleOpenUserMenu}
+                                />
+                            ) : (
+                                <Button
+                                    key='Login'
+                                    variant="contained"
+                                    color="primary"
+                                    href={AUTH_URL}
+                                    sx={{ mr: 3 }}
+                                >
+                                    Login
+                                </Button>
+                            )}
                         </Tooltip>
                         <Menu
                             sx={{ mt: '45px' }}
@@ -166,8 +193,8 @@ export default function Navbar() {
                             open={Boolean(anchorElUser)}
                             onClose={handleCloseUserMenu}
                         >
-                            <MenuItem key='Profile' onClick={handleCloseUserMenu}>
-                                <Typography textAlign="center">Profiles</Typography>
+                            <MenuItem key='Profile' onClick={() => { navigate('/profile'); }}>
+                                <Typography textAlign="center">Profile</Typography>
                             </MenuItem>
                             <MenuItem key='Logout' onClick={handleLogout}>
                                 <Typography textAlign="center">Logout</Typography>

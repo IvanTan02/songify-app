@@ -3,29 +3,47 @@ import { useState, useEffect } from "react";
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import axios from "axios";
 
+// PAGES
 import './App.css';
 import Login from './pages/Login';
-import AuthCallback from "./hooks/AuthCallback";
 import Dashboard from './pages/Dashboard';
-import Navbar from './components/Navbar';
 import Statistics from "./pages/Statistics";
+import Profile from "./pages/Profile";
+
+// COMPONENT
+import Navbar from './components/Navbar';
+import AuthCallback from "./hooks/AuthCallback";
 
 function App() {
 
   const [accessToken, setAccessToken] = useState(localStorage.getItem('accessToken'));
 
+  const isAccessTokenValid = () => {
+    const expired = localStorage.getItem('expired');
+    return expired && new Date().getTime() < expired;
+  }
+
   useEffect(() => {
     const refreshToken = localStorage.getItem('refreshToken');
     const expiresIn = localStorage.getItem('expiresIn');
 
+    if (!isAccessTokenValid()) refreshAccessToken(refreshToken);
+
+    // SET 1 HOUR TOKEN REFRESH CYCLE
     if (refreshToken && expiresIn) {
-      const expirationTime = (expiresIn - 60) * 1000;
+      localStorage.setItem('expired', (new Date().getTime() + expiresIn * 1000));
+      console.log(new Date().getTime());
+      console.log(localStorage.getItem('expired'));
+      console.log(localStorage.getItem('expired') - new Date().getTime());
+      const refreshTime = (expiresIn - 120) * 1000;
+      console.log(refreshTime);
       setInterval(() => {
         refreshAccessToken(refreshToken);
-      }, expirationTime);
+      }, refreshTime);
     }
   }, []);
 
+  // REFRESH ACCESS TOKEN
   const refreshAccessToken = (refreshToken) => {
     console.log('REFRESH ACCESS TOKEN:', refreshToken);
     axios.post('http://localhost:3001/refresh', { refreshToken })
@@ -55,6 +73,7 @@ function App() {
         )} />
         <Route path="/login" element={<AuthCallback />} />
         <Route path="/statistics" element={<Statistics />} />
+        <Route path="/profile" element={<Profile />} />
       </Routes>
     </Router>
   </>
